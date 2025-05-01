@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "r_rscfd_dev.h": "c",
+        "r_rscfd.h": "c",
+        "stbc.h": "c"
+    }
+}

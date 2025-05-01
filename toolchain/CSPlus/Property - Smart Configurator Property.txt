@@ -1,0 +1,11 @@
+﻿CS+ V8.13.00  [05 Dec 2024] [Property - Smart Configurator Property]
+jeudi 1 mai 2025 08:34:34
+Project Name :pe0
+Tool : R7F702300B, CC-RH, RH850 Simulator, Program Analyzer, Smart Configurator
+------------------------------------------------------------------------------
+ Category                    Name                                               Value                                                                                             Active help
+[Smart Configurator Setting]
+ Product Information                                                                                                                                                              
+                             Version                                            V1.02.10.03 [14 Nov 2024]                                                                         This is the version of the product.
+ Smart configurator setting                                                                                                                                                       
+                             Smart Configurator for RH850 executable file path  C:\Program Files (x86)\Renesas Electronics\SmartConfigurator\RH850\eclipse\SmartConfigurator.exe  Specify the Smart Configurator for RH850 executable file path.

@@ -1,0 +1,46 @@
+#!gbuild
+[Subproject]
+        -ISmartConfigurator/general
+        -ISmartConfigurator/OSTM0
+        -ISmartConfigurator/PORT
+        -ISmartConfigurator/RLIN39
+        -ISmartConfigurator/r_pincfg
+        -ISmartConfigurator/STBC
+        -object_dir=objs\
+SmartConfigurator/general/r_cg_cgc.c
+SmartConfigurator/general/r_cg_cgc.h
+SmartConfigurator/general/r_cg_cgc_user.c
+SmartConfigurator/general/r_cg_intc_PE0.c
+SmartConfigurator/general/r_cg_intc_PE1.c
+SmartConfigurator/general/r_cg_intc_PE2.c
+SmartConfigurator/general/r_cg_intc_PE3.c
+SmartConfigurator/general/r_cg_intvector_PE0.c
+SmartConfigurator/general/r_cg_intvector_PE1.c
+SmartConfigurator/general/r_cg_intvector_PE2.c
+SmartConfigurator/general/r_cg_intvector_PE3.c
+SmartConfigurator/general/r_cg_macrodriver.h
+SmartConfigurator/general/r_cg_main.c
+SmartConfigurator/general/r_cg_ostm.h
+SmartConfigurator/general/r_cg_port.h
+SmartConfigurator/general/r_cg_stbc.h
+SmartConfigurator/general/r_cg_systeminit.c
+SmartConfigurator/general/r_cg_uart.h
+SmartConfigurator/general/r_cg_userdefine.h
+SmartConfigurator/general/r_smc_entry.h
+SmartConfigurator/general/r_smc_interrupt.c
+SmartConfigurator/general/r_smc_interrupt.h
+SmartConfigurator/general/r_smc_intprg.c
+SmartConfigurator/OSTM0/OSTM0.c
+SmartConfigurator/OSTM0/OSTM0.h
+SmartConfigurator/OSTM0/OSTM0_user.c
+SmartConfigurator/PORT/PORT.c
+SmartConfigurator/PORT/PORT.h
+SmartConfigurator/PORT/PORT_user.c
+SmartConfigurator/RLIN39/RLIN39.c
+SmartConfigurator/RLIN39/RLIN39.h
+SmartConfigurator/RLIN39/RLIN39_user.c
+SmartConfigurator/r_pincfg/Pin.c
+SmartConfigurator/r_pincfg/Pin.h
+SmartConfigurator/STBC/STBC.c
+SmartConfigurator/STBC/STBC.h
+SmartConfigurator/STBC/STBC_user.c
