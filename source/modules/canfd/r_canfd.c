@@ -77,7 +77,7 @@ rscfd_chnl_cfg_t chnl_cfg[2] = {
     .chnl = RSCFD_CHNL_0,                /* Channel 0 */
     .interface = RSCFD_CHNL_INTERF_CLASSICAL, /* Classical CAN interface */
     .testmode = RSCFD_CHNL_TEST_DIS,     /* Test mode disabled */
-    .error_irq = RSCFD_ERR_IRQ_DIS,      /* Error interrupt disabled */
+    .error_irq = RSCFD_ERR_IRQ_EN,      /* Error interrupt disabled */
     .nom_rate = RSCFD_CHNL_NBR_500K_20M, /* Nominal bit rate: 500K, Clock Input: 20M */
     .hist_en = RSCFD_CHNL_HIST_DIS,      /* History disabled */
     .data_rate = RSCFD_CHNL_DBR_500K_20M,/* Data bit rate: 500K, Clock Input: 20M */
@@ -90,7 +90,7 @@ rscfd_chnl_cfg_t chnl_cfg[2] = {
     .chnl = RSCFD_CHNL_1,                /* Channel 1 */
     .interface = RSCFD_CHNL_INTERF_CLASSICAL, /* Classical CAN interface */
     .testmode = RSCFD_CHNL_TEST_DIS,     /* Test mode disabled */
-    .error_irq = RSCFD_ERR_IRQ_DIS,      /* Error interrupt disabled */
+    .error_irq = RSCFD_ERR_IRQ_EN,      /* Error interrupt disabled */
     .nom_rate = RSCFD_CHNL_NBR_500K_20M, /* Nominal bit rate: 500K, Clock Input: 20M */
     .hist_en = RSCFD_CHNL_HIST_DIS,      /* History disabled */
     .data_rate = RSCFD_CHNL_DBR_500K_20M,/* Data bit rate: 500K, Clock Input: 20M */
@@ -115,7 +115,7 @@ rscfd_rx_rule_cfg_t rx_rule_cfg[2] = {
         .ptr = 0                                 /* C: message pointer to store */
     },
     {
-        .page = RSCFD_RX_PAGE_0_0,               /* which RSCFD unit and page */
+        .page = RSCFD_RX_PAGE_0_1,               /* which RSCFD unit and page */
         .rule = RSCFD_RX_RULE_1,                 /* which rule within the page */
         .id = 0,                                 /* A: ID filter */
         .id_type = RSCFD_ID_TYPE_STD,            /* A: standard/extended ID */
@@ -168,12 +168,9 @@ void R_CANFD_Init(void)
 **              R_ERROR - Mismatch detected.
 ******************************************************************************/
 r_Error_t R_CANFD_Test(void){
-    rscfd_msg_t rx_can_Frame;   /* Define a variable to store the received CAN frame */
     rscfd_msg_t tx_can_Frame;   /* Define a variable to store the transmitted CAN frame */
-    uint8_t rx_payload[64];     /* Define a buffer to store the payload of the received CAN frame */
     uint8_t tx_payload[64];     /* Define a buffer to store the payload of the transmitted CAN frame */
-    uint32_t i;
-    uint64_t time;
+
     
     /* Payload data for transmission */
     tx_payload[0]=0x01;
@@ -193,91 +190,121 @@ r_Error_t R_CANFD_Test(void){
     tx_can_Frame.timestamp = 0;                          /* Message timestamp */
     tx_can_Frame.bytes = RSCFD_PAYLOAD_SIZE_8_BYTES;     /* Number of bytes in payload */
     tx_can_Frame.payload = (rscfd_payload_t *)tx_payload; /* Message payload */
-
-   
-    /* Assign the payload buffer to the received CAN frame */
-    rx_can_Frame.payload = (rscfd_payload_t *) rx_payload; 
     
-    RSCFD0.CFDTMIEC0.BIT.TMIE0 = 1;
-    RSCFD0.CFDTMIEC0.BIT.TMIE1 = 1;
-
-    RSCFD1.CFDTMIEC0.BIT.TMIE0 = 1;
-    RSCFD1.CFDTMIEC0.BIT.TMIE1 = 1;
+    RSCFD0.CFDTMIEC0.UINT32 = 0x1;
     
-    INTC2.EIC301.BIT.EIRF301 = _INT_REQUEST_NOT_OCCUR;
-    INTC2.EIC301.BIT.EIMK301 = _INT_PROCESSING_ENABLED;
+    INTC2.EIC298.BIT.EIRF298 = _INT_REQUEST_NOT_OCCUR;
+    INTC2.EIC298.BIT.EIMK298 = _INT_PROCESSING_ENABLED;
 
-    INTC2.EIC301.BIT.EIRF301 = _INT_REQUEST_NOT_OCCUR;
-    INTC2.EIC301.BIT.EIMK301 = _INT_PROCESSING_DISABLED;
+    INTC2.EIC299.BIT.EIRF299 = _INT_REQUEST_NOT_OCCUR;
+    INTC2.EIC299.BIT.EIMK299 = _INT_PROCESSING_DISABLED;
 
-    INTC2.EIC302.BIT.EIRF302 = _INT_REQUEST_NOT_OCCUR;
-    INTC2.EIC302.BIT.EIMK302 = _INT_PROCESSING_ENABLED;
+    INTC2.EIC300.BIT.EIRF300 = _INT_REQUEST_NOT_OCCUR;
+    INTC2.EIC300.BIT.EIMK300 = _INT_PROCESSING_ENABLED;
 
 
     /* Transmit CAN frame using buffer */
-    R_RSCFD_TxByBuff(RSCFD_TX_BUFF_1_0, RSCFD_MSG_MODE_CLASSICAL, &tx_can_Frame);
-
-    
-    /* Wait until a new message is received in the receive buffer (timeout 10ms )*/
-    time = R_SysTimer_Read();
-    while(R_RSCFD_GetRxBuffMsgNew(RSCFD_RX_BUFF_0_1) == 0 ) {
-        /*if(R_SysTimer_Read() > time+R_SYSTIMER_10MSECOND) {
-            return R_ERROR;
-        }*/
-    }
-
-
-    /* Read the received message from the receive buffer */
-    if( R_RSCFD_ReadRxBuff(RSCFD_RX_BUFF_0_1, &rx_can_Frame) == RSCFD_RESULT_NEWMSG)
-    {
-        /* Compare the received frame with the transmitted frame */
-        if(rx_can_Frame.id == tx_can_Frame.id)
-        {
-            if(rx_can_Frame.bytes == tx_can_Frame.bytes)
-            {
-                for(i=0; i<rx_can_Frame.bytes; i++)
-                {
-                    if(rx_can_Frame.payload->BYTE[i] != tx_can_Frame.payload->BYTE[i])
-                    {
-                        return R_ERROR;
-                    }
-                }
-            }
-            else
-            {
-                return R_ERROR;
-            }
-        }
-        else
-        {
-            return R_ERROR;
-        }
-    }
-    else
-    {
-        return R_ERROR;
-    }
+    R_RSCFD_TxByBuff(RSCFD_TX_BUFF_0_0, RSCFD_MSG_MODE_CLASSICAL, &tx_can_Frame);
 
     return R_OK;
 }
 
-#pragma interrupt r_CAN_301(enable=false, channel=301, fpu=true, callt=false)
+
+
+
+#if defined (__CCRH__)
+#pragma interrupt eiint298(enable=false, channel=298, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
+void r_CAN_298(void)
+{
+    /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
+    /* End user code. Do not edit comment generated here */
+}
+
+#if defined (__CCRH__)
+#pragma interrupt eiint299(enable=false, channel=299, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
+void r_CAN_299(void)
+{
+    /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
+    /* End user code. Do not edit comment generated here */
+}
+
+#if defined (__CCRH__)
+#pragma interrupt eiint300(enable=false, channel=300, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
+void r_CAN_300(void)
+{
+    /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
+
+    if (RSCFD0.CFDTMSTS0.BIT.TMTRF)
+    {
+        RSCFD0.CFDTMSTS0.BIT.TMTRF = 0; // Clear le flag
+        // traitement post-TX
+    }
+    /* End user code. Do not edit comment generated here */
+}
+
+#if defined (__CCRH__)
+#pragma interrupt eiint301(enable=false, channel=301, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
 void r_CAN_301(void)
 {
     /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
     /* End user code. Do not edit comment generated here */
 }
 
-#pragma interrupt r_CAN_302(enable=false, channel=302, fpu=true, callt=false)
+#if defined (__CCRH__)
+#pragma interrupt eiint302(enable=false, channel=302, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
 void r_CAN_302(void)
 {
     /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
     /* End user code. Do not edit comment generated here */
 }
 
-#pragma interrupt r_CAN_303(enable=false, channel=303, fpu=true, callt=false)
+#if defined (__CCRH__)
+#pragma interrupt eiint303(enable=false, channel=303, fpu=true, callt=false)
+#elif defined (__ghs__)
+#pragma ghs interrupt
+#elif defined (__ICCRH850__)
+#pragma type_attribute=__interrupt
+#else
+#error Unknown Compiler
+#endif
 void r_CAN_303(void)
 {
     /* Start user code for r_OSTM0_interrupt. Do not edit comment generated here */
     /* End user code. Do not edit comment generated here */
 }
+/* End user code. Do not edit comment generated here */

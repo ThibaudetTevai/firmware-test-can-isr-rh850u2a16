@@ -643,11 +643,11 @@ extern void eiint296(void);
 /* RSCAN0 CAN receive FIFO interrupt; */
 extern void eiint297(void);
 /* CAN0 error interrupt; */
-extern void eiint298(void);
+extern void r_CAN_298(void);
 /* CAN0 transmit/receive FIFO receive completion interrupt; */
-extern void eiint299(void);
+extern void r_CAN_299(void);
 /* CAN0 transmit interrupt; */
-extern void eiint300(void);
+extern void r_CAN_300(void);
 /* CAN1 error interrupt; */
 extern void r_CAN_301(void);
 /* CAN1 transmit/receive FIFO receive completion interrupt; */
@@ -2199,11 +2199,11 @@ __root void * const INT_Vectors_PE0[] = {
     /* RSCAN0 CAN receive FIFO interrupt; */
     (void *)eiint297,
     /* CAN0 error interrupt; */
-    (void *)eiint298,
+    (void *)r_CAN_298,
     /* CAN0 transmit/receive FIFO receive completion interrupt; */
-    (void *)eiint299,
+    (void *)r_CAN_299,
     /* CAN0 transmit interrupt; */
-    (void *)eiint300,
+    (void *)r_CAN_300,
     /* CAN1 error interrupt; */
     (void *)r_CAN_301,
     /* CAN1 transmit/receive FIFO receive completion interrupt; */

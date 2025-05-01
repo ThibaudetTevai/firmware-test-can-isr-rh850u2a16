@@ -35,6 +35,8 @@ Includes
 #include "drivers\stbc_iohold\r_stbc_iohold.h"
 #include "modules\canfd\r_canfd.h"
 
+#include "r_smc_entry.h"
+
 /***********************************************************************************************************************
 Defines
 ***********************************************************************************************************************/
@@ -95,19 +97,26 @@ void Pe0SystemStatusInit(void)
 ***********************************************************************************************************************/
 int main(int argc, char *argv[])
 {
+    uint8_t v_cnt = 0;
      
     /* Handle reset condition detection */
     SYSCTRL.RESFC.UINT32 = 0x0000F5DD;  /* Clear reset flags */
 
     /* Initialize hardware and system services */
     Pe0PeripheralInit();
+    
+    /* Initialize interrupts for PE0 */  
+    R_Interrupt_Initialize_ForPE0();
 
     /* Enable interrupts */
     __EI(); 
     
     R_CANFD_Test();
     /* should never reach this point */
-    while(1);                          
+    while(1)
+    {
+        v_cnt++;
+    }
 }
 
 /***********************************************************************************************************************

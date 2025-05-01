@@ -56,7 +56,7 @@ Global variables and functions
 ***********************************************************************************************************************/
 void R_Systeminit(void)
 {
-    R_Interrupt_Initialize_ForPE();
+    R_Interrupt_Initialize_ForPE0();
     /* Set peripheral settings */
     R_PORT_Create();
     R_CGC_Create();
